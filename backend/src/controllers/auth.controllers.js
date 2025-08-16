@@ -6,6 +6,7 @@ import { passwordValidator } from "../utils/passwordValidator.js";
 import { hashValue, compareHash } from "../utils/hasher.js";
 import { COOKIE_OPTIONS } from "../constants.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { safeDocument } from "../utils/safeDocument.js";
 
 export const signUp = async (req, res) => {
     try {
@@ -19,18 +20,22 @@ export const signUp = async (req, res) => {
 
         // Validate inputs
         if (!name || !email || !password || !username) {
-            return res.status(400).json({ message: "All fields are required" });
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "All fields are required"));
         }
 
         // Validate email format
         if (!validator.isEmail(email)) {
-            return res.status(400).json({ message: "Invalid email address" });
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Invalid email address"));
         }
 
         // Validate password strength
         const { valid, message } = passwordValidator(password);
         if (!valid) {
-            return res.status(400).json({ message });
+            return res.status(400).json(new ApiResponse(400, message));
         }
 
         // Check for existing user
@@ -53,16 +58,18 @@ export const signUp = async (req, res) => {
         });
 
         // Generate token
-        const accessToken = generateToken(newUser._id);
+        const accessToken = generateToken({
+            id: newUser._id,
+            role: newUser.role,
+        });
 
+        const safeUser = safeDocument(newUser, ["password"]);
         // Send response
         res.status(201)
             .cookie("accessToken", accessToken, COOKIE_OPTIONS)
             .json(
                 new ApiResponse(201, "User created successfully", {
-                    _id: newUser._id,
-                    email: newUser.email,
-                    name: newUser.name,
+                    user: safeUser,
                     accessToken: accessToken,
                 })
             );
@@ -74,15 +81,14 @@ export const signUp = async (req, res) => {
 
 export const signIn = async (req, res) => {
     try {
-        let { email, username, password } = req.body;
+        let { credential, password } = req.body;
 
         // Normalize inputs
-        email = email?.trim().toLowerCase();
+        credential = credential?.trim().toLowerCase();
         password = password?.trim();
-        username = username?.trim().toLowerCase();
 
         // Validate inputs
-        if (!(email || username) && !password) {
+        if (!credential && !password) {
             return res
                 .status(400)
                 .json(new ApiResponse(400, "All fields are required"));
@@ -90,8 +96,8 @@ export const signIn = async (req, res) => {
 
         // Check for existing user
         const user = await User.findOne({
-            $or: [{ email }, { username }],
-        });
+            $or: [{ email: credential }, { username: credential }],
+        }).select("+password");
         if (!user) {
             return res
                 .status(401)
@@ -105,16 +111,19 @@ export const signIn = async (req, res) => {
         }
 
         // Generate token
-        const accessToken = generateToken(user._id);
+        const accessToken = generateToken({
+            id: user._id,
+            role: user.role,
+        });
+
+        const safeUser = safeDocument(user, ["password"]);
 
         // Send response
         res.status(200)
             .cookie("accessToken", accessToken, COOKIE_OPTIONS)
             .json(
                 new ApiResponse(200, "User signed in successfully", {
-                    _id: user._id,
-                    email: user.email,
-                    name: user.name,
+                    user: safeUser,
                     accessToken: accessToken,
                 })
             );
@@ -125,8 +134,8 @@ export const signIn = async (req, res) => {
 };
 
 export const signOut = async (req, res) => {
-    res.clearCookie("token");
-    return res.status(200).json({
-        message: "User signed out successfully",
-    });
+    res.clearCookie("accessToken");
+    return res
+        .status(200)
+        .json(new ApiResponse(200, "User signed out successfully"));
 };

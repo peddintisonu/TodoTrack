@@ -15,3 +15,9 @@ export const COOKIE_OPTIONS = {
     secure: process.env.NODE_ENV === "production",
     maxAge: 24 * 60 * 60 * 1000, // 1 day
 };
+
+// PRIORITY LEVELS
+export const PRIORITY_LEVELS = ["low", "medium", "high"];
+
+// STATUS LEVELS
+export const STATUS_LEVELS = ["not started", "in progress", "completed"];

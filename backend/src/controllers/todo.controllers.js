@@ -1,138 +1,364 @@
-import {
-    addTodo,
-    getTodosByUserId,
-    updateTodo,
-    updateStatus,
-    deleteTodo,
-    getTodoById,
-} from "../models/todo.model.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import { Todo } from "../models/todo.model.js";
+import { safeDocument } from "../utils/safeDocument.js";
+import { PRIORITY_LEVELS, STATUS_LEVELS } from "../constants.js";
 
+// ADMIN ROUTES
 export const getAllTodos = async (req, res) => {
-    const userId = req.user.id;
     try {
-        const todos = await getTodosByUserId(userId);
-        res.status(200).json(todos);
+        const { status, priority } = req.query;
+
+        let filters = {};
+        if (status) filters.status = status;
+        if (priority) filters.priority = priority;
+
+        const todos = await Todo.find(filters);
+
+        if (!todos || todos.length === 0) {
+            return res.status(404).json(new ApiResponse(404, "No todos found"));
+        }
+
+        const safeTodos = todos.map((todo) => safeDocument(todo));
+        res.status(200).json(
+            new ApiResponse(200, "All todos fetched successfully", safeTodos)
+        );
     } catch (error) {
-        res.status(500).json({ message: "Error fetching todos" });
+        console.error("GetAllTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
 
-export const getOneTodo = async (req, res) => {
-    const id = Number(req.params.id);
+export const deleteAllTodos = async (req, res) => {
     try {
-        const todo = await getTodoById(id);
-        if (!todo) {
-            return res.status(404).json({ message: "Todo not found" });
+        // Check if the user is an admin
+        if (req.user.role !== "admin") {
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
         }
-        res.status(200).json(todo);
+
+        // Remove all todos
+        await Todo.deleteMany({});
+        res.status(200).json(
+            new ApiResponse(200, "All todos deleted successfully")
+        );
     } catch (error) {
-        res.status(500).json({ message: "Error fetching todo" });
+        console.error("RemoveAllTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+export const getUserTodos = async (req, res) => {
+    try {
+        const { status, priority } = req.query;
+
+        let filters = {};
+        if (status) filters.status = status;
+        if (priority) filters.priority = priority;
+
+        // Fetch all todos for the current user
+        const todos = await Todo.find({ userId: req.params.id, ...filters });
+
+        if (!todos || todos.length === 0) {
+            return res.status(404).json(new ApiResponse(404, "No todos found"));
+        }
+
+        res.status(200).json(
+            new ApiResponse(200, "User todos fetched successfully", todos)
+        );
+    } catch (error) {
+        console.error("GetUserTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+export const deleteUserTodos = async (req, res) => {
+    try {
+        // Remove all todos for a specific user
+        await Todo.deleteMany({ userId: req.params.id });
+        res.status(200).json(
+            new ApiResponse(200, "All todos for user deleted successfully")
+        );
+    } catch (error) {
+        console.error("RemoveUserTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+// USER ROUTES
+export const getMyTodos = async (req, res) => {
+    try {
+        const { status, priority } = req.query;
+
+        let filters = {};
+        if (status) filters.status = status;
+        if (priority) filters.priority = priority;
+
+        const todos = await Todo.find({ userId: req.user.id, ...filters });
+        if (!todos || todos.length === 0) {
+            return res.status(404).json(new ApiResponse(404, "No todos found"));
+        }
+
+        const safeTodos = todos.map((todo) => safeDocument(todo));
+        res.status(200).json(
+            new ApiResponse(200, "User todos fetched successfully", safeTodos)
+        );
+    } catch (error) {
+        console.error("GetUserTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+export const deleteMyTodos = async (req, res) => {
+    try {
+        // Remove all todos for a specific user
+        await Todo.deleteMany({ userId: req.user.id });
+        res.status(200).json(
+            new ApiResponse(
+                200,
+                "All your todos have been successfully deleted"
+            )
+        );
+    } catch (error) {
+        console.error("RemoveUserTodos Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+// COMMON ROUTES
+export const getTodoById = async (req, res) => {
+    try {
+        // Validate request parameters
+        if (!req.params.id) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Todo ID is required"));
+        }
+
+        // Fetch todo by ID
+        const todo = await Todo.findById(req.params.id);
+        if (!todo) {
+            return res.status(404).json(new ApiResponse(404, "Todo not found"));
+        }
+
+        // Check user permissions if the todo is found
+        if (req.user.role === "admin" || req.user.id === todo?.userId) {
+            res.status(200).json(
+                new ApiResponse(200, "Todo fetched successfully", todo)
+            );
+        } else {
+            // User is not authorized to access this todo if he is not the owner
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
+    } catch (error) {
+        console.error("GetOneTodo Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
 
 export const createTodo = async (req, res) => {
-    const userId = req.user.id;
-    const { title, description } = req.body;
-
-    if (!title) {
-        return res.status(400).json({ message: "Title is required" });
-    }
-
     try {
-        const newTodo = await addTodo({ userId, title, description });
-        res.status(201).json({ message: "Todo created successfully", newTodo });
+        const { title, description, status, priority } = req.body;
+
+        // Validate request body
+        if (!title) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Title is required"));
+        }
+
+        // Create new todo
+        const newTodo = await Todo.create({
+            userId: req.user.id,
+            title,
+            description,
+            status,
+            priority,
+        });
+
+        res.status(201).json(
+            new ApiResponse(201, "Todo created successfully", newTodo)
+        );
     } catch (error) {
-        res.status(500).json({ message: "Error creating todo" });
+        console.error("CreateTodo Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
 
-export const modifyTodo = async (req, res) => {
-    const id = Number(req.params.id);
-    const { title, description } = req.body;
-
-    console.log(id);
-
-    console.log(req.body);
-
-    if (!title && !description) {
-        return res
-            .status(400)
-            .json({ message: "Title or description is required" });
-    }
-
-    const todo = await getTodoById(id);
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
-    }
-    if (todo.userId !== req.user.id) {
-        return res.status(403).json({ message: "Unauthorized" });
-    }
-
+export const updateTodoStatus = async (req, res) => {
     try {
-        const updatedTodo = await updateTodo(id, { title, description });
-        if (!updatedTodo) {
-            return res.status(404).json({ message: "Todo not found" });
+        // Validate request parameters
+        if (!req.params.id) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Todo ID is required"));
         }
-        res.status(200).json({
-            message: "Todo updated successfully",
-            updatedTodo,
-        });
+
+        if (!req.body.status || !STATUS_LEVELS.includes(req.body.status)) {
+            return res
+                .status(400)
+                .json(
+                    new ApiResponse(
+                        400,
+                        `Invalid status level. Please choose one of the following: ${STATUS_LEVELS.join(", ")}.`
+                    )
+                );
+        }
+
+        // Fetch todo by ID
+        const todo = await Todo.findById(req.params.id);
+        if (!todo) {
+            return res.status(404).json(new ApiResponse(404, "Todo not found"));
+        }
+
+        // Check user permissions if the todo is found
+        if (
+            req.user.role === "admin" ||
+            req.user.id === todo.userId.toString()
+        ) {
+            todo.status = req.body.status;
+            await todo.save();
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Todo status updated successfully",
+                        todo
+                    )
+                );
+        } else {
+            // User is not authorized to modify this todo if he is not the owner
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error updating todo" });
+        console.error("ModifyStatus Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
 
-export const modifyStatus = async (req, res) => {
-    const id = Number(req.params.id);
-    const { status } = req.body;
-
-    if (!status) {
-        return res.status(400).json({ message: "Status is required" });
-    }
-
-    const todo = await getTodoById(id);
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
-    }
-    if (todo.userId !== req.user.id) {
-        return res.status(403).json({ message: "Unauthorized" });
-    }
-
+export const updateTodoPriority = async (req, res) => {
     try {
-        const updatedTodo = await updateStatus(id, status);
-        if (!updatedTodo) {
-            return res.status(404).json({ message: "Todo not found" });
+        // Validate request parameters
+        if (!req.params.id) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Todo ID is required"));
         }
-        res.status(200).json({
-            message: "Todo status updated successfully",
-            updatedTodo,
-        });
+        if (
+            !req.body.priority ||
+            !PRIORITY_LEVELS.includes(req.body.priority)
+        ) {
+            return res
+                .status(400)
+                .json(
+                    new ApiResponse(
+                        400,
+                        `Invalid priority level. Please choose one of the following: ${PRIORITY_LEVELS.join(", ")}.`
+                    )
+                );
+        }
+
+        // Fetch todo by ID
+        const todo = await Todo.findById(req.params.id);
+        if (!todo) {
+            return res.status(404).json(new ApiResponse(404, "Todo not found"));
+        }
+
+        // Check user permissions if the todo is found
+        if (
+            req.user.role === "admin" ||
+            req.user.id === todo.userId.toString()
+        ) {
+            todo.priority = req.body.priority || todo.priority;
+            await todo.save();
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(
+                        200,
+                        "Todo priority updated successfully",
+                        todo
+                    )
+                );
+        } else {
+            // User is not authorized to modify this todo if he is not the owner
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error updating todo status" });
+        console.error("ModifyPriority Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
 
-export const removeTodo = async (req, res) => {
-    const id = Number(req.params.id);
-
-    const todo = await getTodoById(id);
-    if (!todo) {
-        return res.status(404).json({ message: "Todo not found" });
-    }
-    if (todo.userId !== req.user.id) {
-        return res.status(403).json({ message: "Unauthorized" });
-    }
-
+export const updateTodo = async (req, res) => {
     try {
-        const deletedTodo = await deleteTodo(id);
-        if (!deletedTodo) {
-            return res.status(404).json({ message: "Todo not found" });
+        // Validate request parameters
+        if (!req.params.id) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Todo ID is required"));
         }
-        res.status(200).json({
-            message: "Todo deleted successfully",
-            deletedTodo,
-        });
+
+        // Fetch todo by ID
+        const todo = await Todo.findById(req.params.id);
+        if (!todo) {
+            return res.status(404).json(new ApiResponse(404, "Todo not found"));
+        }
+
+        // Check user permissions if the todo is found
+        if (
+            req.user.role === "admin" ||
+            req.user.id === todo.userId.toString()
+        ) {
+            todo.title = req.body.title || todo.title;
+            todo.description = req.body.description || todo.description;
+            todo.status = req.body.status || todo.status;
+            todo.priority = req.body.priority || todo.priority;
+
+            await todo.save();
+
+            return res
+                .status(200)
+                .json(new ApiResponse(200, "Todo updated successfully", todo));
+        } else {
+            // User is not authorized to modify this todo
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
     } catch (error) {
-        res.status(500).json({ message: "Error deleting todo" });
+        console.error("ModifyTodo Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
+    }
+};
+
+export const deleteTodo = async (req, res) => {
+    try {
+        // Validate request parameters
+        if (!req.params.id) {
+            return res
+                .status(400)
+                .json(new ApiResponse(400, "Todo ID is required"));
+        }
+
+        // Fetch todo by ID
+        const todo = await Todo.findById(req.params.id);
+        if (!todo) {
+            return res.status(404).json(new ApiResponse(404, "Todo not found"));
+        }
+
+        // Check user permissions if the todo is found
+        if (
+            req.user.role === "admin" ||
+            req.user.id === todo.userId.toString()
+        ) {
+            await todo.deleteOne();
+            return res
+                .status(200)
+                .json(new ApiResponse(200, "Todo removed successfully"));
+        } else {
+            // User is not authorized to modify this todo if he is not the owner
+            return res.status(403).json(new ApiResponse(403, "Forbidden"));
+        }
+    } catch (error) {
+        console.error("RemoveTodo Error:", error);
+        res.status(500).json(new ApiResponse(500, "Internal server error"));
     }
 };
