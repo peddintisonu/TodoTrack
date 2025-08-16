@@ -14,7 +14,6 @@ import { restrictTo } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// Base: /api/v1/users
 // ---------- Current user routes ----------
 router.get("/me", getMyProfile); // Get my profile
 router.get("/me/stats", getMyStats); // Get my stats

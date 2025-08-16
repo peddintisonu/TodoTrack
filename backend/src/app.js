@@ -2,6 +2,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
+import cors from "cors";
 import { fileURLToPath } from "url";
 
 import { protectRoute } from "./middlewares/auth.middleware.js";
@@ -9,6 +10,7 @@ import { protectRoute } from "./middlewares/auth.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import todoRoutes from "./routes/todo.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import { ENV } from "./config/env.config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +21,12 @@ const app = express();
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+    cors({
+        origin: ENV.CLIENT_URL || "http://localhost:5173",
+        credentials: true,
+    })
+);
 
 // 3) ROUTES (ADD YOUR API ROUTES HERE — BEFORE ANY CATCH-ALL)
 app.use("/api/v1/auth", authRoutes);

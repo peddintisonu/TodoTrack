@@ -3,7 +3,8 @@ import { ENV } from "../config/env.config.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 export const protectRoute = (req, res, next) => {
-    const token = req.cookies.accessToken;
+    const headerToken = req.headers.authorization.split(" ")[1];
+    const token = headerToken || req.cookies.accessToken;
 
     if (!token) {
         return res.status(401).json(new ApiResponse(401, "No token provided"));
