@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/env.config.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { User } from "../models/user.model.js";
 
 export const protectRoute = (req, res, next) => {
     const token = req.cookies.accessToken;
