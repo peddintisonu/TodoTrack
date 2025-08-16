@@ -5,7 +5,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { protectRoute } from "./middlewares/auth.middleware.js";
-import { ENV } from "./config/env.config.js";
 
 import authRoutes from "./routes/auth.routes.js";
 import todoRoutes from "./routes/todo.routes.js";
@@ -13,12 +12,10 @@ import todoRoutes from "./routes/todo.routes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const port = ENV.PORT;
-
 const app = express();
 
 // 2) MIDDLEWARE
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -31,7 +28,7 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 // 5) CATCH-ALL  (should be LAST)
 app.use(/(.*)/, (_, res) => {
-	res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+    res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 });
 
 export { app };
