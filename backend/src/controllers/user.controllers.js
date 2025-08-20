@@ -220,21 +220,24 @@ export const deleteMyAccount = async (req, res) => {
 export const getMyStats = async (req, res) => {
     try {
         const userId = req.user.id;
-
+        const query = { userId };
         let { priority } = req.query;
-        if (!PRIORITY_LEVELS.includes(priority)) {
-            return res
-                .status(400)
-                .json(
-                    new ApiResponse(
-                        400,
-                        `Invalid priority level. Please choose one of the following: ${PRIORITY_LEVELS.join(", ")}.`
-                    )
-                );
+        if (priority) {
+            if (!PRIORITY_LEVELS.includes(priority)) {
+                return res
+                    .status(400)
+                    .json(
+                        new ApiResponse(
+                            400,
+                            `Invalid priority level. Please choose one of the following: ${PRIORITY_LEVELS.join(", ")}.`
+                        )
+                    );
+            }
+            query.priority = priority;
         }
 
         // Get total todos count
-        const totalTodos = await Todo.countDocuments({ userId, priority });
+        const totalTodos = await Todo.countDocuments(query);
 
         // Get completed todos count
         const completedTodos = await Todo.countDocuments({
