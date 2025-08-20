@@ -1,27 +1,45 @@
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/env.config.js";
 import ApiResponse from "../utils/ApiResponse.js";
-
 export const protectRoute = (req, res, next) => {
-    const headerToken = req.headers.authorization.split(" ")[1];
-    const token = headerToken || req.cookies.accessToken;
+    try {
+        let token = null;
 
-    if (!token) {
-        return res.status(401).json(new ApiResponse(401, "No token provided"));
+        // 1. Prioritize the Authorization header (standard for APIs)
+        if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith("Bearer ")
+        ) {
+            token = req.headers.authorization.split(" ")[1];
+        }
+        // 2. Fallback to the cookie (useful for web browsers)
+        else if (req.cookies.accessToken) {
+            token = req.cookies.accessToken;
+        }
+
+        // 3. If no token is found after checking both places, deny access.
+        if (!token) {
+            return res
+                .status(401)
+                .json(new ApiResponse(401, "Unauthorized: No token provided"));
+        }
+
+        // 4. Verify the token within a try...catch block.
+        const decoded = jwt.verify(token, ENV.JWT_SECRET);
+
+        // 5. Attach a minimal user object to the request for downstream routes.
+        // It's good practice not to query the DB again in middleware unless necessary.
+        req.user = { id: decoded.id, role: decoded.role };
+
+        next();
+    } catch (error) {
+        // This block will catch errors from jwt.verify (e.g., expired or invalid token)
+        return res
+            .status(401)
+            .json(
+                new ApiResponse(401, "Unauthorized: Invalid or expired token")
+            );
     }
-
-    const decoded = jwt.verify(token, ENV.JWT_SECRET);
-    if (!decoded) {
-        return res.status(401).json(new ApiResponse(401, "Invalid token"));
-    }
-
-    const user = { id: decoded.id, role: decoded.role };
-
-    if (!user) {
-        return res.status(401).json(new ApiResponse(401, "User not found"));
-    }
-    req.user = user;
-    next();
 };
 
 export const restrictTo = (...roles) => {

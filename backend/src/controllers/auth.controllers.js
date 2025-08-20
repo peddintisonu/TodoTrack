@@ -98,6 +98,7 @@ export const signIn = async (req, res) => {
         const user = await User.findOne({
             $or: [{ email: credential }, { username: credential }],
         }).select("+password");
+
         if (!user) {
             return res
                 .status(401)

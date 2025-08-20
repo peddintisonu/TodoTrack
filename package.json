@@ -1,15 +1,26 @@
 {
-  "name": "todotrack",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
-    "dev:backend": "npm run dev --prefix backend",
-    "dev:frontend": "npm run dev --prefix frontend",
-    "build": "npm run build --prefix frontend",
-    "start": "npm run start --prefix backend"
-  },
-  "devDependencies": {
-    "concurrently": "^9.0.0"
-  }
+    "name": "todotrack",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+        "dev:backend": "npm run dev --prefix backend",
+        "dev:frontend": "npm run dev --prefix frontend",
+        "build": "npm run build --prefix frontend",
+        "start": "npm run start --prefix backend"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.33.0",
+        "concurrently": "^9.0.0",
+        "cross-env": "^10.0.0",
+        "eslint": "^9.33.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "globals": "^16.3.0",
+        "nodemon": "^3.1.10",
+        "prettier": "3.6.2"
+    },
+    "dependencies": {
+        "lucide-react": "^0.540.0"
+    }
 }
