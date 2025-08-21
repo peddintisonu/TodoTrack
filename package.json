@@ -2,6 +2,8 @@
     "name": "todotrack",
     "version": "1.0.0",
     "private": true,
+    "description": "A full-stack todo tracking application with user authentication in Node.js using MongoDB and Express for the backend, and React with Vite for the frontend.",
+    "author": "Siva Peddinti",
     "workspaces": [
         "backend",
         "frontend"
