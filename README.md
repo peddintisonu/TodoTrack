@@ -14,7 +14,8 @@
 
 ## 🚀 Live Demo
 
-**[todotrack-buildwithsonu.vercel.app](https://todotrack-buildwithsonu.vercel.app/)**
+- **Frontend:** [todotrack-buildwithsonu.vercel.app](https://todotrack-buildwithsonu.vercel.app/)
+- **Backend API:** [todotrack-backend.onrender.com](https://todotrack-backend.onrender.com/)
 
 ## ✨ Features
 
