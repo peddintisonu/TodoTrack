@@ -12,6 +12,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Spinner from "../components/ui/Spinner";
 import ConfirmationToast from "../components/ui/ConfirmationToast";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 // A small, local component for displaying profile details
 const DetailRow = ({ label, value }) => (
@@ -22,6 +23,8 @@ const DetailRow = ({ label, value }) => (
 );
 
 export default function ProfilePage() {
+    useDocumentTitle("Profile");
+
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 

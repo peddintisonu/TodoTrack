@@ -65,6 +65,21 @@
     button {
         @apply cursor-pointer;
     }
+
+    /* For Firefox */
+    * {
+        scrollbar-width: none;
+    }
+
+    /* For Internet Explorer and Edge (pre-Chromium) */
+    * {
+        -ms-overflow-style: none;
+    }
+
+    /* For Webkit-based browsers (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 /* --- Reusable Component Classes --- */

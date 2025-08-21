@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import useAuth from "../hooks/useAuth";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 import PageLayout from "../components/layout/PageLayout";
 import AuthForm from "../components/auth/AuthForm";
 
 export default function LoginPage() {
+    useDocumentTitle("Login");
+
     const navigate = useNavigate();
     const { user, login } = useAuth();
 

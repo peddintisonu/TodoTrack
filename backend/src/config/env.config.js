@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 const envFile =
-    process.env.NODE_ENV === "production"
+    process.env.NODE_ENV === "PRODUCTION"
         ? ".env.production"
         : ".env.development";
 

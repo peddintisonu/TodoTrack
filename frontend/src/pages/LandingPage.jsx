@@ -3,8 +3,11 @@ import { features } from "../constants.jsx";
 import PageLayout from "../components/layout/PageLayout";
 import Button from "../components/ui/Button";
 import Separator from "../components/ui/Separator";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 
 export default function LandingPage() {
+    useDocumentTitle("Welcome");
+
     return (
         <PageLayout>
             {/* Hero section with the main headline and call-to-action. */}

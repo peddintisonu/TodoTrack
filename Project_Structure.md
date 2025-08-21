@@ -1,6 +1,6 @@
 # File Tree: Todotrack
 
-Generated on: 8/21/2025, 3:31:59 PM
+Generated on: 8/21/2025, 6:59:49 PM
 Root path: `d:\Web-Projects\Todotrack`
 
 ```
@@ -51,6 +51,8 @@ Root path: `d:\Web-Projects\Todotrack`
 │   │   │   ├── 📄 todos.js
 │   │   │   └── 📄 user.js
 │   │   ├── 📁 components/
+│   │   │   ├── 📁 auth/
+│   │   │   │   └── 📄 AuthForm.jsx
 │   │   │   ├── 📁 layout/
 │   │   │   │   └── 📄 PageLayout.jsx
 │   │   │   ├── 📁 todos/
@@ -64,7 +66,6 @@ Root path: `d:\Web-Projects\Todotrack`
 │   │   │   │   ├── 📄 Separator.jsx
 │   │   │   │   ├── 📄 Spinner.jsx
 │   │   │   │   └── 📄 ThemeToggle.jsx
-│   │   │   ├── 📄 AuthForm.jsx
 │   │   │   ├── 📄 Footer.jsx
 │   │   │   └── 📄 Navbar.jsx
 │   │   ├── 📁 context/
@@ -74,12 +75,13 @@ Root path: `d:\Web-Projects\Todotrack`
 │   │   │   ├── 📄 useAuth.js
 │   │   │   └── 📄 useTheme.js
 │   │   ├── 📁 pages/
-│   │   │   ├── 📄 DashBoard.jsx
-│   │   │   ├── 📄 Home.jsx
+│   │   │   ├── 📄 DashboardPage.jsx
+│   │   │   ├── 📄 HomePage.jsx
 │   │   │   ├── 📄 LandingPage.jsx
-│   │   │   ├── 📄 Login.jsx
+│   │   │   ├── 📄 LoginPage.jsx
+│   │   │   ├── 📄 NotFoundPage.jsx
 │   │   │   ├── 📄 ProfilePage.jsx
-│   │   │   └── 📄 Signup.jsx
+│   │   │   └── 📄 SignupPage.jsx
 │   │   ├── 📄 App.jsx
 │   │   ├── 📄 constants.jsx
 │   │   ├── 🎨 index.css
@@ -96,10 +98,10 @@ Root path: `d:\Web-Projects\Todotrack`
 ├── 🚫 .gitignore
 ├── 📄 .prettierignore
 ├── 📄 .prettierrc
+├── 📝 Project_Structure.md
 ├── 📄 eslint.config.mjs
 ├── 📄 package-lock.json
-├── 📄 package.json
-└── 📄 vercel.json
+└── 📄 package.json
 ```
 
 ---

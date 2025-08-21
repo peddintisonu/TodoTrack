@@ -17,6 +17,7 @@ import Modal from "../components/ui/Modal";
 import ConfirmationToast from "../components/ui/ConfirmationToast";
 import TodoCard from "../components/todos/TodoCard";
 import TodoForm from "../components/todos/TodoForm";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const statusFilterOptions = ["all", "not started", "in progress", "completed"];
 const priorityFilterOptions = ["all", "high", "medium", "low"];
@@ -32,6 +33,8 @@ const StatCard = ({ title, value, className = "" }) => (
 );
 
 export default function DashboardPage() {
+    useDocumentTitle("Dashboard");
+
     const [stats, setStats] = useState(null);
     const [todos, setTodos] = useState([]);
     const [currentStatusFilter, setCurrentStatusFilter] = useState("all");

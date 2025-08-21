@@ -1,8 +1,10 @@
 import { Frown } from "lucide-react";
 import PageLayout from "../components/layout/PageLayout";
 import Button from "../components/ui/Button";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 export default function NotFoundPage() {
+    useDocumentTitle("Page Not Found");
     return (
         <PageLayout>
             {/* Main container to center the content on the page. */}
