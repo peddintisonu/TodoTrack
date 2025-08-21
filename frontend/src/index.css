@@ -2,15 +2,13 @@
 
 @import "tailwindcss";
 
-/* Light theme */
+/* --- Color & Theme Variables --- */
 :root {
     --color-bg: #ffffff;
     --color-fg: #111827;
     --color-muted: #6b7280;
     --color-border: #e5e7eb;
     --color-input-bg: #f9fafb;
-
-    /* Orange scale */
     --color-primary-50: #fff7ed;
     --color-primary-100: #ffedd5;
     --color-primary-200: #fed7aa;
@@ -24,25 +22,12 @@
     --color-primary: var(--color-primary-500);
 }
 
-/* Dark theme */
 .dark {
     --color-bg: #111827;
     --color-fg: #f9fafb;
     --color-muted: #9ca3af;
     --color-border: #374151;
     --color-input-bg: #1f2937;
-
-    /* Orange scale */
-    --color-primary-50: #fff7ed;
-    --color-primary-100: #ffedd5;
-    --color-primary-200: #fed7aa;
-    --color-primary-300: #fdba74;
-    --color-primary-400: #fb923c;
-    --color-primary-500: #f97316;
-    --color-primary-600: #ea580c;
-    --color-primary-700: #c2410c;
-    --color-primary-800: #9a3412;
-    --color-primary-900: #7c2d12;
     --color-primary: var(--color-primary-500);
 }
 
@@ -53,8 +38,6 @@
     --color-muted: var(--color-muted);
     --color-border: var(--color-border);
     --color-input-bg: var(--color-input-bg);
-
-    /* Orange scale */
     --color-primary-50: var(--color-primary-50);
     --color-primary-100: var(--color-primary-100);
     --color-primary-200: var(--color-primary-200);
@@ -68,7 +51,7 @@
     --color-primary: var(--color-primary);
 }
 
-/* Base typography & buttons */
+/* --- Base Element Styles --- */
 @layer base {
     h1 {
         @apply text-4xl font-bold text-fg tracking-tight leading-normal;
@@ -79,12 +62,14 @@
     h3 {
         @apply text-2xl font-medium text-fg mt-4 mb-1;
     }
+    button {
+        @apply cursor-pointer;
+    }
 }
 
-/* Reusable component classes */
+/* --- Reusable Component Classes --- */
 @layer components {
-    /* === THE FIX FOR THE CRASH IS HERE === */
-    /* We merge the base button styles directly into each variant */
+    /* Buttons */
     .btn-primary {
         @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-primary text-white hover:bg-primary-600 active:bg-primary-700;
     }
@@ -92,58 +77,47 @@
         @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-border text-fg hover:bg-primary-50 dark:hover:bg-primary-900/20;
     }
 
-    /* === THE FIX FOR THE INVISIBLE INPUTS IS HERE === */
+    /* Inputs */
     .input {
         @apply w-full px-3 py-2 rounded-lg border border-border bg-input-bg text-fg transition-colors;
         @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
         @apply placeholder:text-muted/70;
     }
 
+    /* Badges */
     .badge {
         @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
     }
-
-    /* Red for High Priority */
     .badge-red {
         @apply bg-red-100 text-red-800;
     }
     .dark .badge-red {
         @apply bg-red-900/30 text-red-300;
     }
-
-    /* Yellow for Medium Priority */
     .badge-yellow {
         @apply bg-yellow-100 text-yellow-800;
     }
     .dark .badge-yellow {
         @apply bg-yellow-800/20 text-yellow-300;
     }
-
-    /* Green for Low Priority */
     .badge-green {
         @apply bg-green-100 text-green-800;
     }
     .dark .badge-green {
         @apply bg-green-900/30 text-green-300;
     }
-
-    /* Gray for Not Started */
     .badge-gray {
         @apply bg-gray-200 text-gray-800;
     }
     .dark .badge-gray {
         @apply bg-gray-700 text-gray-300;
     }
-
-    /* Blue for In Progress */
     .badge-blue {
         @apply bg-blue-100 text-blue-800;
     }
     .dark .badge-blue {
         @apply bg-blue-900/30 text-blue-300;
     }
-
-    /* Purple for Completed */
     .badge-purple {
         @apply bg-purple-100 text-purple-800;
     }
@@ -151,7 +125,7 @@
         @apply bg-purple-900/30 text-purple-300;
     }
 
-    /* Form utility classes */
+    /* Form Utilities */
     .form-group {
         @apply w-full flex flex-col gap-1.5;
     }
