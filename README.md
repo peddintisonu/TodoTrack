@@ -51,7 +51,7 @@ Follow these instructions to get the project up and running on your local machin
 ### 2. Clone the Repository
 
 ```sh
-git clone https://github.com/your-username/todotrack.git
+git clone https://github.com/peddintisonu/TodoTrack.git
 cd todotrack
 ```
 
