@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
+
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import Spinner from "../ui/Spinner";
 
-// Define options based on your Mongoose schema for consistency
 const priorityOptions = ["low", "medium", "high"];
 const statusOptions = ["not started", "in progress", "completed"];
 
-// A clean initial state for the form
 const initialFormState = {
     title: "",
     description: "",
@@ -25,8 +24,7 @@ export default function TodoForm({
     const [formData, setFormData] = useState(initialFormState);
     const [error, setError] = useState("");
 
-    // This effect runs when the component loads or when the `initialData` prop changes.
-    // If we are in 'edit' mode, it populates the form fields with the data of the todo being edited.
+    // Populate the form with existing data when in "edit" mode.
     useEffect(() => {
         if (mode === "edit" && initialData) {
             setFormData({
@@ -36,29 +34,28 @@ export default function TodoForm({
                 status: initialData.status || "not started",
             });
         } else {
-            // If creating a new todo, ensure the form is reset
             setFormData(initialFormState);
         }
     }, [mode, initialData]);
 
+    // Update form state on user input.
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    // Handle form submission and validation.
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Simple validation: only the title is required.
         if (!formData.title.trim()) {
             setError("Title is required.");
             return;
         }
-        setError(""); // Clear previous errors
-        onSubmit(formData); // Pass the form data up to the parent (DashboardPage)
+        setError("");
+        onSubmit(formData);
     };
 
     return (
-        // The form is now the root element, without extra wrappers or titles.
         <form onSubmit={handleSubmit} className="w-full space-y-4">
             <Input
                 id="title"
@@ -78,7 +75,7 @@ export default function TodoForm({
                     id="description"
                     name="description"
                     rows="3"
-                    placeholder="e.g., Include Q4 sales data and future projections"
+                    placeholder="e.g., Include Q4 sales data"
                     className="input"
                     value={formData.description}
                     onChange={handleChange}

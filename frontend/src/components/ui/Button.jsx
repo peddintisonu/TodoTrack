@@ -7,13 +7,12 @@ export default function Button({
     children,
     ...props
 }) {
-    const baseClasses =
-        "inline-flex items-center justify-center rounded-xl px-6 py-3 font-medium transition-colors";
-    const variantClasses =
+    // Determine the correct CSS class based on the variant prop.
+    const variantClass =
         variant === "primary" ? "btn-primary" : "btn-secondary";
 
-    // Combine classes using template literals
-    const combinedClasses = `${baseClasses} ${variantClasses} ${className}`;
+    // Combine the variant class with any additional classes passed via props.
+    const combinedClasses = `${variantClass} ${className}`;
 
     if (to) {
         return (

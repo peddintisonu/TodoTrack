@@ -1,40 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
 import toast from "react-hot-toast";
-import PageLayout from "../components/layout/PageLayout";
-import AuthForm from "../components/AuthForm";
 
-export default function Login() {
+import useAuth from "../hooks/useAuth";
+
+import PageLayout from "../components/layout/PageLayout";
+import AuthForm from "../components/auth/AuthForm";
+
+export default function LoginPage() {
     const navigate = useNavigate();
     const { user, login } = useAuth();
 
-    if (user) {
-        navigate("/");
-    }
-
     const [formData, setFormData] = useState({ credential: "", password: "" });
-    const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
+    // Redirect if the user is already logged in.
+    useEffect(() => {
+        if (user) {
+            navigate("/", { replace: true });
+        }
+    }, [user, navigate]);
+
+    // Update form state on user input.
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!formData.credential)
-            newErrors.credential = "Email or Username is required";
-        if (!formData.password) newErrors.password = "Password is required";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
+    // Handle form submission and API call.
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
-
         setIsLoading(true);
         try {
             await login(formData);
@@ -42,8 +37,7 @@ export default function Login() {
             navigate("/");
         } catch (error) {
             toast.error(
-                error.response?.data?.message ||
-                    "Invalid credentials. Please try again."
+                error.response?.data?.message || "Invalid credentials."
             );
         } finally {
             setIsLoading(false);
@@ -59,7 +53,6 @@ export default function Login() {
                     isLoading={isLoading}
                     formData={formData}
                     handleInputChange={handleInputChange}
-                    errors={errors}
                 />
             </div>
         </PageLayout>

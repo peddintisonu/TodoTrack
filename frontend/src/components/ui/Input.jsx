@@ -31,14 +31,13 @@ export default function Input({ id, label, error, type = "text", ...props }) {
                         }
                     >
                         {isVisible ? (
-                            <EyeOff className="h-5 w-5" />
+                            <EyeOff className="h-5 w-5 cursor-pointer" />
                         ) : (
-                            <Eye className="h-5 w-5" />
+                            <Eye className="h-5 w-5 cursor-pointer" />
                         )}
                     </button>
                 )}
             </div>
-            {/* THE FIX: 'error' is now expected to be a simple string. */}
             {error && <p className="form-error">{error}</p>}
         </div>
     );

@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
-// API Services
 import { getMyStats } from "../api/user";
 import {
     getMyTodos,
@@ -12,7 +11,6 @@ import {
     updateTodoStatus,
 } from "../api/todos";
 
-// Components
 import PageLayout from "../components/layout/PageLayout";
 import Spinner from "../components/ui/Spinner";
 import Modal from "../components/ui/Modal";
@@ -20,11 +18,10 @@ import ConfirmationToast from "../components/ui/ConfirmationToast";
 import TodoCard from "../components/todos/TodoCard";
 import TodoForm from "../components/todos/TodoForm";
 
-// Constants for filter options
 const statusFilterOptions = ["all", "not started", "in progress", "completed"];
 const priorityFilterOptions = ["all", "high", "medium", "low"];
 
-// A small, local component for displaying a single stat
+// A small, local component for displaying a single stat.
 const StatCard = ({ title, value, className = "" }) => (
     <div
         className={`p-4 rounded-lg border border-border bg-input-bg ${className}`}
@@ -35,22 +32,19 @@ const StatCard = ({ title, value, className = "" }) => (
 );
 
 export default function DashboardPage() {
-    // Data states
     const [stats, setStats] = useState(null);
     const [todos, setTodos] = useState([]);
     const [currentStatusFilter, setCurrentStatusFilter] = useState("all");
     const [currentPriorityFilter, setCurrentPriorityFilter] = useState("all");
 
-    // Loading and error states
     const [isStatsLoading, setIsStatsLoading] = useState(true);
     const [isTodosLoading, setIsTodosLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // UI state for the modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTodo, setEditingTodo] = useState(null);
 
-    // Single source of truth for refreshing the dashboard
+    // Fetches all necessary data for the dashboard.
     const fetchAllData = async () => {
         try {
             const [statsData, todosData] = await Promise.all([
@@ -60,35 +54,31 @@ export default function DashboardPage() {
             setStats(statsData);
             setTodos(todosData);
         } catch (error) {
-            toast.error("Failed to fetch dashboard data. Please refresh.");
+            toast.error("Failed to fetch dashboard data.");
         } finally {
             setIsStatsLoading(false);
             setIsTodosLoading(false);
         }
     };
 
-    // Fetch initial data on component mount
+    // Initial data fetch on component mount.
     useEffect(() => {
         fetchAllData();
     }, []);
 
-    // Memoized filter for performance, now handles both filters
+    // Filters the todos based on the selected status and priority.
     const filteredTodos = useMemo(() => {
-        let filtered = todos;
-        if (currentStatusFilter !== "all") {
-            filtered = filtered.filter(
-                (todo) => todo.status === currentStatusFilter
-            );
-        }
-        if (currentPriorityFilter !== "all") {
-            filtered = filtered.filter(
-                (todo) => todo.priority === currentPriorityFilter
-            );
-        }
-        return filtered;
+        return todos.filter((todo) => {
+            const statusMatch =
+                currentStatusFilter === "all" ||
+                todo.status === currentStatusFilter;
+            const priorityMatch =
+                currentPriorityFilter === "all" ||
+                todo.priority === currentPriorityFilter;
+            return statusMatch && priorityMatch;
+        });
     }, [todos, currentStatusFilter, currentPriorityFilter]);
 
-    // --- Modal and Form Handlers ---
     const handleOpenModal = (todo = null) => {
         setEditingTodo(todo);
         setIsModalOpen(true);
@@ -101,12 +91,11 @@ export default function DashboardPage() {
 
     const handleFormSubmit = async (formData) => {
         setIsSubmitting(true);
-        const action = editingTodo
+        const isEditing = !!editingTodo;
+        const action = isEditing
             ? updateTodo(editingTodo._id, formData)
             : createTodo(formData);
-        const successMessage = editingTodo
-            ? "Todo updated successfully!"
-            : "Todo created successfully!";
+        const successMessage = isEditing ? "Todo updated!" : "Todo created!";
 
         try {
             await action;
@@ -124,10 +113,12 @@ export default function DashboardPage() {
         const confirmDelete = async () => {
             try {
                 await deleteTodo(todoId);
-                toast.success("Todo deleted successfully!");
+                toast.success("Todo deleted!");
                 await fetchAllData();
             } catch (error) {
-                toast.error("Failed to delete todo.");
+                toast.error(
+                    error.response?.data?.message || "Failed to delete todo."
+                );
             }
         };
 
@@ -136,10 +127,13 @@ export default function DashboardPage() {
                 <ConfirmationToast
                     t={t}
                     onConfirm={confirmDelete}
-                    message="Are you sure you want to delete this todo?"
+                    message="Delete this todo permanently?"
                 />
             ),
-            { duration: Infinity, position: "top-center" }
+            {
+                duration: Infinity,
+                position: "top-center",
+            }
         );
     };
 
@@ -148,15 +142,15 @@ export default function DashboardPage() {
             currentStatus === "completed" ? "in progress" : "completed";
         const successMessage =
             newStatus === "completed"
-                ? "Task marked as complete!"
-                : "Task moved back to In Progress!";
+                ? "Task completed!"
+                : "Task moved to In Progress.";
 
         try {
             await updateTodoStatus(todoId, newStatus);
             toast.success(successMessage);
             await fetchAllData();
         } catch (error) {
-            toast.error("Failed to update task status.");
+            toast.error("Failed to update status.");
         }
     };
 
@@ -195,9 +189,10 @@ export default function DashboardPage() {
 
                 {/* Todos Section */}
                 <section className="mt-8">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
                         <h2 className="text-2xl font-bold">Your Todos</h2>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-2 sm:mt-0">
+                        {/* THE FIX: `flex-wrap` allows filters to stack on small screens. `justify-end` aligns them right on larger screens. */}
+                        <div className="flex flex-wrap items-center justify-start md:justify-end gap-4">
                             {/* Status Filter */}
                             <div className="flex items-center gap-2 p-1 bg-input-bg border border-border rounded-lg">
                                 {statusFilterOptions.map((opt) => (
@@ -206,11 +201,7 @@ export default function DashboardPage() {
                                         onClick={() =>
                                             setCurrentStatusFilter(opt)
                                         }
-                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${
-                                            currentStatusFilter === opt
-                                                ? "bg-primary text-white"
-                                                : "hover:bg-primary/10"
-                                        }`}
+                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${currentStatusFilter === opt ? "bg-primary text-white" : "hover:bg-primary/10"}`}
                                     >
                                         {opt}
                                     </button>
@@ -224,11 +215,7 @@ export default function DashboardPage() {
                                         onClick={() =>
                                             setCurrentPriorityFilter(opt)
                                         }
-                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${
-                                            currentPriorityFilter === opt
-                                                ? "bg-primary text-white"
-                                                : "hover:bg-primary/10"
-                                        }`}
+                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${currentPriorityFilter === opt ? "bg-primary text-white" : "hover:bg-primary/10"}`}
                                     >
                                         {opt}
                                     </button>
@@ -256,7 +243,7 @@ export default function DashboardPage() {
                     ) : (
                         <div className="text-center p-8 border-2 border-dashed border-border rounded-xl">
                             <h3 className="text-lg font-semibold">
-                                No todos found!
+                                No Todos Found
                             </h3>
                             <p className="text-muted mt-1">
                                 Try adjusting your filters or add a new todo.
@@ -266,7 +253,6 @@ export default function DashboardPage() {
                 </section>
             </div>
 
-            {/* Floating Action Button */}
             <button
                 onClick={() => handleOpenModal()}
                 className="absolute bottom-8 right-8 btn-primary !rounded-full h-14 w-14 shadow-lg z-10"
@@ -275,11 +261,10 @@ export default function DashboardPage() {
                 <Plus className="h-7 w-7" />
             </button>
 
-            {/* Modal for Creating/Editing Todos */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
-                title={editingTodo ? "Edit Todo" : "Create a New Todo"}
+                title={editingTodo ? "Edit Todo" : "Create New Todo"}
             >
                 <TodoForm
                     mode={editingTodo ? "edit" : "create"}

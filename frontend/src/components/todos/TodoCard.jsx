@@ -1,7 +1,7 @@
 import { Flag, FilePenLine, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
 
-// Config objects remain the same
+// Configuration for badge styles and labels based on todo properties.
 const priorityConfig = {
     high: { label: "High", badgeClass: "badge-red" },
     medium: { label: "Medium", badgeClass: "badge-yellow" },
@@ -19,17 +19,18 @@ export default function TodoCard({ todo, onEdit, onDelete, onToggleStatus }) {
     const isCompleted = todo.status === "completed";
 
     return (
+        // Main card container with conditional styling for completed tasks.
         <div
             className={clsx(
                 "flex flex-col rounded-xl border border-border bg-input-bg p-4 shadow-sm transition-all hover:shadow-lg min-h-[180px]",
-                isCompleted && "bg-gray-50 dark:bg-gray-800/20 opacity-70" // Add opacity for completed tasks
+                isCompleted && "bg-gray-50 dark:bg-gray-800/20 opacity-70"
             )}
         >
+            {/* Top section with checkbox, title, and description. */}
             <div className="flex items-start gap-3">
                 <input
                     type="checkbox"
                     checked={isCompleted}
-                    // THE FIX: The checkbox is no longer disabled. It calls the new onToggleStatus handler.
                     onChange={() => onToggleStatus(todo._id, todo.status)}
                     className="h-5 w-5 mt-1 accent-primary cursor-pointer"
                     aria-label="Toggle task completion"
@@ -56,6 +57,7 @@ export default function TodoCard({ todo, onEdit, onDelete, onToggleStatus }) {
                 </div>
             </div>
 
+            {/* Bottom section with badges and action buttons. */}
             <div className="mt-auto flex items-end justify-between pt-4 border-t border-border">
                 <div className="flex items-center gap-2">
                     <div className={clsx("badge", priority.badgeClass)}>
@@ -76,7 +78,7 @@ export default function TodoCard({ todo, onEdit, onDelete, onToggleStatus }) {
                         <FilePenLine className="h-4 w-4" />
                     </button>
                     <button
-                        onClick={() => onDelete(todo._id)}
+                        onClick={onDelete}
                         className="btn-secondary !p-2 h-9 w-9 hover:bg-red-500/10 hover:text-red-500"
                         aria-label="Delete todo"
                     >

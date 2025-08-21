@@ -1,80 +1,72 @@
 import { createContext, useState, useEffect } from "react";
+
 import {
     login as apiLogin,
     signup as apiSignup,
-    logout as apiSignout,
+    logout as apiLogout,
 } from "../api/auth";
 
+// The context is now a local constant, not exported.
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // This part runs on initial page load or refresh
+    // Handles setting user state and storing session data.
+    const handleAuthSuccess = (authData) => {
+        const userToStore = authData?.user;
+        const tokenToStore = authData?.accessToken;
+
+        if (userToStore && tokenToStore) {
+            localStorage.setItem("user", JSON.stringify(userToStore));
+            localStorage.setItem("accessToken", tokenToStore);
+            setUser(userToStore);
+        }
+    };
+
+    // On initial load, check for an existing session in localStorage.
     useEffect(() => {
         try {
             const storedUser = localStorage.getItem("user");
             if (storedUser) {
                 setUser(JSON.parse(storedUser));
             }
-            // Note: We don't need to load the token into React state.
-            // The Axios interceptor will read it directly from localStorage when needed.
         } catch (error) {
-            console.error("Failed to parse user from localStorage", error);
-            localStorage.removeItem("user"); // Clear corrupted data
+            console.error("Failed to parse user from localStorage:", error);
+            localStorage.removeItem("user");
         }
         setLoading(false);
     }, []);
 
+    // Handles user login.
     const login = async (credentials) => {
-        // `authData` will be the object: { user: {...}, accessToken: "..." }
         const authData = await apiLogin(credentials);
-
-        const userToStore = authData.user;
-        const tokenToStore = authData.accessToken;
-
-        if (userToStore && tokenToStore) {
-            // THE FIX: Save both the user object and the access token
-            localStorage.setItem("user", JSON.stringify(userToStore));
-            localStorage.setItem("accessToken", tokenToStore);
-            setUser(userToStore);
-        }
-
+        handleAuthSuccess(authData);
         return authData;
     };
 
+    // Handles new user signup.
     const signup = async (data) => {
-        // `authData` will be the object: { user: {...}, accessToken: "..." }
         const authData = await apiSignup(data);
-
-        const userToStore = authData.user;
-        const tokenToStore = authData.accessToken;
-
-        if (userToStore && tokenToStore) {
-            // THE FIX: Save both the user object and the access token
-            localStorage.setItem("user", JSON.stringify(userToStore));
-            localStorage.setItem("accessToken", tokenToStore);
-            setUser(userToStore);
-        }
-
+        handleAuthSuccess(authData);
         return authData;
     };
 
+    // Handles user logout.
     const logout = async () => {
         try {
-            await apiSignout();
+            await apiLogout();
         } catch (error) {
             console.error(
-                "Logout API call failed, logging out client-side anyway.",
+                "Logout API call failed, logging out client-side anyway:",
                 error
             );
         } finally {
-            // THE FIX: Remove both items for a complete logout
             localStorage.removeItem("user");
             localStorage.removeItem("accessToken");
             setUser(null);
-            window.location.href = "/login"; // Force a full redirect to clear all state
+            window.location.href = "/login";
         }
     };
 
@@ -85,4 +77,5 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
+// Export the context itself for the hook to use.
 export default AuthContext;

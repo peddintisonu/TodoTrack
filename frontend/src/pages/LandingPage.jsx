@@ -1,12 +1,13 @@
+import { features } from "../constants.jsx";
+
 import PageLayout from "../components/layout/PageLayout";
 import Button from "../components/ui/Button";
-import Separator from "../components/ui/Separator"; // Import the new component
-import { features } from "../constants.jsx";
+import Separator from "../components/ui/Separator";
 
 export default function LandingPage() {
     return (
         <PageLayout>
-            {/* Hero Section */}
+            {/* Hero section with the main headline and call-to-action. */}
             <section className="container mx-auto flex flex-col items-center justify-center text-center px-4 py-20 sm:py-28">
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight">
                     Clarity Through{" "}
@@ -29,10 +30,9 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Visual Separator */}
             <Separator />
 
-            {/* Features Section */}
+            {/* Features section showcasing the app's benefits. */}
             <section
                 id="features"
                 className="container mx-auto px-4 py-20 sm:py-28"

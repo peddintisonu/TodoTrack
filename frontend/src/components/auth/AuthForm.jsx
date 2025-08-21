@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
-import Button from "./ui/Button";
-import Input from "./ui/Input";
-import Spinner from "./ui/Spinner";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Spinner from "../ui/Spinner";
 
-// Configuration for form fields and text
 const formConfig = {
     login: {
         title: "Welcome Back!",
@@ -67,12 +66,10 @@ export default function AuthForm({
     isLoading,
     formData,
     handleInputChange,
-    errors,
 }) {
     const config = formConfig[mode];
 
     return (
-        // This container creates the card effect and is responsive
         <div className="w-full max-w-md space-y-8 rounded-2xl border border-border bg-bg p-6 sm:p-8 shadow-lg">
             <div className="text-center">
                 <h1 className="text-3xl font-bold">{config.title}</h1>
@@ -87,9 +84,9 @@ export default function AuthForm({
                         label={input.label}
                         type={input.type}
                         placeholder={input.placeholder}
-                        value={formData[input.id] || ""} // Ensure value is never undefined
+                        value={formData[input.id] || ""}
                         onChange={handleInputChange}
-                        error={errors[input.id]}
+                        // The error prop is no longer passed to the Input component.
                     />
                 ))}
 

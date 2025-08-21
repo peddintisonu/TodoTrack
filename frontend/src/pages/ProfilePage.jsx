@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
@@ -24,6 +24,12 @@ const DetailRow = ({ label, value }) => (
 export default function ProfilePage() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login");
+        }
+    }, [user, navigate]);
 
     // State for the change password form is now simpler
     const [passwordData, setPasswordData] = useState({

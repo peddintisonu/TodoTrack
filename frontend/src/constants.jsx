@@ -1,9 +1,6 @@
 import { FilePenLine, Flag, TrendingUp, Shield } from "lucide-react";
 
-/**
- * An array of feature objects for the landing page.
- * Each object contains the icon, title, and description.
- */
+// Features of App
 export const features = [
     {
         icon: <FilePenLine className="h-6 w-6 text-primary" />,

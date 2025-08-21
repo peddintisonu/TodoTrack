@@ -1,17 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
 import toast from "react-hot-toast";
-import PageLayout from "../components/layout/PageLayout";
-import AuthForm from "../components/AuthForm";
 
-export default function Signup() {
+import useAuth from "../hooks/useAuth";
+
+import PageLayout from "../components/layout/PageLayout";
+import AuthForm from "../components/auth/AuthForm";
+
+export default function SignupPage() {
     const navigate = useNavigate();
     const { user, signup } = useAuth();
-
-    if(user) {
-        navigate("/");
-    }
 
     const [formData, setFormData] = useState({
         name: "",
@@ -19,40 +17,31 @@ export default function Signup() {
         email: "",
         password: "",
     });
-    const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
 
+    // Redirect if the user is already logged in.
+    useEffect(() => {
+        if (user) {
+            navigate("/", { replace: true });
+        }
+    }, [user, navigate]);
+
+    // Update form state on user input.
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!formData.name) newErrors.name = "Name is required";
-        if (!formData.username) newErrors.username = "Username is required";
-        if (!formData.email) newErrors.email = "Email is required";
-        if (!formData.password) newErrors.password = "Password is required";
-        else if (formData.password.length < 6)
-            newErrors.password = "Password must be at least 6 characters";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
+    // Handle form submission and API call.
     const handleSignup = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
-
         setIsLoading(true);
         try {
             await signup(formData);
             toast.success("Account created successfully!");
             navigate("/");
         } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                    "Signup failed. Please try again."
-            );
+            toast.error(error.response?.data?.message || "Signup failed.");
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +56,6 @@ export default function Signup() {
                     isLoading={isLoading}
                     formData={formData}
                     handleInputChange={handleInputChange}
-                    errors={errors}
                 />
             </div>
         </PageLayout>
