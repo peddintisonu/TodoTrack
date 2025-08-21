@@ -7,7 +7,11 @@ import AuthForm from "../components/AuthForm";
 
 export default function Signup() {
     const navigate = useNavigate();
-    const { signup } = useAuth();
+    const { user, signup } = useAuth();
+
+    if(user) {
+        navigate("/");
+    }
 
     const [formData, setFormData] = useState({
         name: "",

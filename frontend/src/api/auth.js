@@ -1,28 +1,20 @@
-// src/api/auth.js
 import api from "./axios";
-// Signup
+
+export const login = async (credentials) => {
+    const response = await api.post("/auth/sign-in", credentials);
+    // Return the object containing both user and accessToken
+    // So we are returning response.data.data -> { user: {...}, accessToken: "..." }
+    return response.data.data;
+};
+
 export const signup = async (data) => {
-    const res = await api.post("/auth/sign-up", data);
-    if (res.data?.data?.accessToken) {
-        localStorage.setItem("accessToken", res.data.data.accessToken);
-    }
-    return res.data;
+    const response = await api.post("/auth/sign-up", data);
+    // Same here, return the object with user and accessToken
+    return response.data.data;
 };
 
-// Login
-export const login = async (data) => {
-    const res = await api.post("/auth/sign-in", data);
-    if (res.data?.data?.accessToken) {
-        localStorage.setItem("accessToken", res.data.data.accessToken);
-    }
-    return res.data;
-};
-
-// Logout
 export const logout = async () => {
-    localStorage.removeItem("accessToken");
-    return api.post("/auth/sign-out");
+    const response = await api.post("/auth/signout");
+    // For logout, we might just care about success, but unwrapping is consistent
+    return response.data.data;
 };
-
-// Get logged-in user
-export const getMe = () => api.get("/auth/me");

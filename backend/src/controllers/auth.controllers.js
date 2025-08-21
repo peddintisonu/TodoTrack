@@ -88,7 +88,7 @@ export const signIn = async (req, res) => {
         password = password?.trim();
 
         // Validate inputs
-        if (!credential && !password) {
+        if (!credential || !password) {
             return res
                 .status(400)
                 .json(new ApiResponse(400, "All fields are required"));

@@ -241,23 +241,20 @@ export const getMyStats = async (req, res) => {
 
         // Get completed todos count
         const completedTodos = await Todo.countDocuments({
-            userId,
+            ...query,
             status: "completed",
-            priority,
         });
 
         // Get pending todos count
         const pendingTodos = await Todo.countDocuments({
-            userId,
+            ...query,
             status: "not started",
-            priority,
         });
 
         // Get in-progress todos count
         const inProgressTodos = await Todo.countDocuments({
-            userId,
+            ...query,
             status: "in progress",
-            priority,
         });
 
         res.status(200).json(

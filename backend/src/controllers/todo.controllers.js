@@ -12,11 +12,7 @@ export const getAllTodos = async (req, res) => {
         if (status) filters.status = status;
         if (priority) filters.priority = priority;
 
-        const todos = await Todo.find(filters);
-
-        if (!todos || todos.length === 0) {
-            return res.status(404).json(new ApiResponse(404, "No todos found"));
-        }
+        const todos = await Todo.find(filters).sort({ createdAt: -1 });
 
         const safeTodos = todos.map((todo) => safeDocument(todo));
         res.status(200).json(
@@ -93,9 +89,6 @@ export const getMyTodos = async (req, res) => {
         if (priority) filters.priority = priority;
 
         const todos = await Todo.find({ userId: req.user.id, ...filters });
-        if (!todos || todos.length === 0) {
-            return res.status(404).json(new ApiResponse(404, "No todos found"));
-        }
 
         const safeTodos = todos.map((todo) => safeDocument(todo));
         res.status(200).json(

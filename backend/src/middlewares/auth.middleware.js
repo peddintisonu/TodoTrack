@@ -32,7 +32,7 @@ export const protectRoute = (req, res, next) => {
         req.user = { id: decoded.id, role: decoded.role };
 
         next();
-    } catch (error) {
+    } catch {
         // This block will catch errors from jwt.verify (e.g., expired or invalid token)
         return res
             .status(401)
