@@ -14,7 +14,7 @@
 
 ## 🚀 Live Demo
 
-**[todotrack-buildwithsonu.vercel.app](https://todotrack-buildwithsonu.vercel.app/)** _(Replace with your deployed frontend URL)_
+**[todotrack-buildwithsonu.vercel.app](https://todotrack-buildwithsonu.vercel.app/)**
 
 ## ✨ Features
 
