@@ -33,7 +33,11 @@ export default function Navbar() {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
-                    <ThemeToggle className={iconButtonClasses} />
+                    <ThemeToggle
+                        className={iconButtonClasses}
+                        data-tooltip-id="navbar-tooltip"
+                        data-tooltip-content="Toggle theme"
+                    />
 
                     {user && (
                         <>
@@ -41,6 +45,8 @@ export default function Navbar() {
                                 to="/profile"
                                 className={iconButtonClasses}
                                 aria-label="View profile"
+                                data-tooltip-id="navbar-tooltip"
+                                data-tooltip-content="View profile"
                             >
                                 <User className="h-5 w-5" />
                             </Link>
@@ -49,6 +55,8 @@ export default function Navbar() {
                                 onClick={logout}
                                 className={iconButtonClasses}
                                 aria-label="Logout"
+                                data-tooltip-id="navbar-tooltip"
+                                data-tooltip-content="Logout"
                             >
                                 <LogOut className="h-5 w-5" />
                             </button>

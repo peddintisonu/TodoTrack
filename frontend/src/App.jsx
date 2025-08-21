@@ -1,9 +1,11 @@
 // src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { Tooltip } from "react-tooltip";
+
 import Home from "./pages/HomePage";
 import Login from "./pages/LoginPage";
 import Signup from "./pages/SignupPage";
-import { Toaster } from "react-hot-toast";
 import Profile from "./pages/ProfilePage";
 import NotFound from "./pages/NotFoundPage";
 
@@ -18,6 +20,7 @@ function App() {
                 <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
+            <Tooltip id="navbar-tooltip" />
         </Router>
     );
 }

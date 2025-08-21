@@ -18,6 +18,7 @@ import ConfirmationToast from "../components/ui/ConfirmationToast";
 import TodoCard from "../components/todos/TodoCard";
 import TodoForm from "../components/todos/TodoForm";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import Button from "../components/ui/Button";
 
 const statusFilterOptions = ["all", "not started", "in progress", "completed"];
 const priorityFilterOptions = ["all", "high", "medium", "low"];
@@ -136,6 +137,12 @@ export default function DashboardPage() {
             {
                 duration: Infinity,
                 position: "top-center",
+                style: {
+                    background: "transparent",
+                    boxShadow: "none",
+                    padding: "0",
+                    border: "none",
+                },
             }
         );
     };
@@ -192,24 +199,24 @@ export default function DashboardPage() {
 
                 {/* Todos Section */}
                 <section className="mt-8">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-                        <h2 className="text-2xl font-bold">Your Todos</h2>
-                        {/* THE FIX: `flex-wrap` allows filters to stack on small screens. `justify-end` aligns them right on larger screens. */}
-                        <div className="flex flex-wrap items-center justify-start md:justify-end gap-4">
-                            {/* Status Filter */}
-                            <div className="flex items-center gap-2 p-1 bg-input-bg border border-border rounded-lg">
-                                {statusFilterOptions.map((opt) => (
-                                    <button
-                                        key={opt}
-                                        onClick={() =>
-                                            setCurrentStatusFilter(opt)
-                                        }
-                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${currentStatusFilter === opt ? "bg-primary text-white" : "hover:bg-primary/10"}`}
-                                    >
-                                        {opt}
-                                    </button>
-                                ))}
-                            </div>
+                    <div className="flex flex-col gap-4 mb-4">
+                        {/* First Row: Title and Create Button */}
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-2xl font-bold !mt-0">
+                                Your Todos
+                            </h2>
+                            <Button
+                                onClick={() => handleOpenModal()}
+                                variant="primary"
+                                className="!py-2 !px-4 flex items-center gap-2"
+                            >
+                                <Plus className="h-4 w-4" />
+                                <span>Create</span>
+                            </Button>
+                        </div>
+
+                        {/* Second Row: Responsive Filters */}
+                        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                             {/* Priority Filter */}
                             <div className="flex items-center gap-2 p-1 bg-input-bg border border-border rounded-lg">
                                 {priorityFilterOptions.map((opt) => (
@@ -219,6 +226,20 @@ export default function DashboardPage() {
                                             setCurrentPriorityFilter(opt)
                                         }
                                         className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${currentPriorityFilter === opt ? "bg-primary text-white" : "hover:bg-primary/10"}`}
+                                    >
+                                        {opt}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Status Filter */}
+                            <div className="flex items-center gap-2 p-1 bg-input-bg border border-border rounded-lg">
+                                {statusFilterOptions.map((opt) => (
+                                    <button
+                                        key={opt}
+                                        onClick={() =>
+                                            setCurrentStatusFilter(opt)
+                                        }
+                                        className={`px-3 py-1 text-sm rounded-md capitalize transition-colors ${currentStatusFilter === opt ? "bg-primary text-white" : "hover:bg-primary/10"}`}
                                     >
                                         {opt}
                                     </button>

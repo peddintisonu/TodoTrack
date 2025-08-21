@@ -114,7 +114,7 @@ export default function ProfilePage() {
 
     return (
         <PageLayout>
-            <div className="container mx-auto max-w-4xl p-4 sm:p-8 space-y-8">
+            <div className="container mx-auto p-4 sm:p-8 space-y-8 max-w-3xl">
                 <h1 className="text-3xl font-bold">Account Settings</h1>
 
                 {/* Profile Details Section */}

@@ -1,42 +1,38 @@
 import { toast } from "react-hot-toast";
 import { AlertTriangle } from "lucide-react";
-
 import Button from "./Button";
 
 export default function ConfirmationToast({ t, onConfirm, message }) {
-    // Closes the toast and triggers the confirmation action.
     const handleConfirm = () => {
         onConfirm();
         toast.dismiss(t.id);
     };
 
-    // Simply closes the toast.
     const handleCancel = () => {
         toast.dismiss(t.id);
     };
 
     return (
-        <div className="flex items-start gap-4 rounded-lg bg-bg p-4 shadow-lg border border-primary/50 max-w-sm">
-            <AlertTriangle className="h-6 w-6 text-primary mt-0.5" />
+        <div className="flex flex-col items-center gap-3 rounded-xl bg-bg p-6 shadow-2xl border border-border max-w-sm text-center">
+            <AlertTriangle className="h-10 w-10 text-primary" />
 
-            <div className="flex-1">
-                <p className="font-semibold text-fg">{message}</p>
-                <div className="mt-4 flex gap-2">
-                    <Button
-                        onClick={handleConfirm}
-                        variant="primary"
-                        className="!px-3 !py-1.5 !text-sm !bg-red-600 hover:!bg-red-700 active:!bg-red-800"
-                    >
-                        Confirm
-                    </Button>
-                    <Button
-                        onClick={handleCancel}
-                        variant="secondary"
-                        className="!px-3 !py-1.5 !text-sm"
-                    >
-                        Cancel
-                    </Button>
-                </div>
+            <p className="text-lg font-semibold text-fg">{message}</p>
+
+            <div className="mt-2 flex w-full gap-4">
+                <Button
+                    onClick={handleConfirm}
+                    variant="primary"
+                    className="w-full !px-6 !py-2 !text-base !bg-red-600 hover:!bg-red-700 active:!bg-red-800"
+                >
+                    Confirm
+                </Button>
+                <Button
+                    onClick={handleCancel}
+                    variant="secondary"
+                    className="w-full !px-6 !py-2 !text-base"
+                >
+                    Cancel
+                </Button>
             </div>
         </div>
     );

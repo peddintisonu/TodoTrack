@@ -2,7 +2,7 @@ import { Sun, Moon } from "lucide-react";
 import { clsx } from "clsx";
 import useTheme from "../../hooks/useTheme";
 
-export default function ThemeToggle({ className }) {
+export default function ThemeToggle({ className, ...props }) {
     const { theme, toggleTheme } = useTheme();
 
     const combinedClasses = clsx(
@@ -15,6 +15,7 @@ export default function ThemeToggle({ className }) {
             onClick={toggleTheme}
             className={combinedClasses}
             aria-label="Toggle theme"
+            {...props}
         >
             {theme === "light" ? (
                 <Moon className="h-5 w-5" />
